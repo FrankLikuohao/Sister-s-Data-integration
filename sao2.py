@@ -1,30 +1,44 @@
 import sys,os 
 
 if len(sys.argv) < 2:  
-    print ("This is the program to integrate the time f(time,value)")
+    print ("This is the program to integrate the function f(time,value) when value > reference level and output the result file")
+    print ("usage:sys.argv[0] input_filename reference_value")
+    print ("ex:sys.argv[0] testfile 94.2")
     print ("Designed by Frank Li at Taipei 2015/10/13 frank.likuohao@gmail.com")  
     sys.exit()
     
-filename=sys.argv[1]
-outfilename= filename + "result.csv"
-target = open(outfilename, 'w')
+if len(sys.argv) >= 2:     
+	filename=sys.argv[1]
+	outfilename= filename + "result.csv"
+	target = open(outfilename, 'w')
+	reference_value=94.2
 
+if len(sys.argv) >= 3:
+	reference_value=float(sys.argv[2])
+
+print (len(sys.argv) )
 lines = tuple(open(filename, 'r'))
 total_record = len(lines)
 hundredcut = int(len(lines) / 100)
-print ("input file [%s] output file [%s] total record [%d]" % (filename,outfilename,total_record));
+
+
+
+print ("input file [%s]\nOutput file [%s] \nReference_value[%8.2f]\ntotal record [%d]" % (filename,outfilename,reference_value,total_record));
 
 title_lines=3
-reference_value=94.2
+
 determ=" "
 summation=0
 skip_line = 0
 
 #for i in range(len(lines)-833117 + 4184 ):
 for i in range(len(lines)- 1 ):
-	if i <= title_lines:
-		print(i,lines[i])
-		target.write(lines[i])
+	if i < title_lines:
+		if i == 0:
+			iterms = "%s %s <%8.3f %s \n"%(lines[i].rstrip('\n'),"y*dt",reference_value,"summation")
+			target.write(iterms)
+		else:
+			target.write(lines[i])
 	#if i <= skip_line:
 	#	next
 	else:
@@ -59,3 +73,4 @@ for i in range(len(lines)- 1 ):
  
 print ("End processing,\nWe write result to file[%s]"% (outfilename))
 target.close()
+
