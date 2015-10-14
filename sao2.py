@@ -16,38 +16,54 @@ if len(sys.argv) >= 2:
 if len(sys.argv) >= 3:
 	reference_value=float(sys.argv[2])
 
-print (len(sys.argv) )
+#print (len(sys.argv) )
 lines = tuple(open(filename, 'r'))
+
+title_lines=1
+skip_line = 3
+
 total_record = len(lines)
+
+row_values_begin=lines[skip_line ].split()
+#print(row_values_begin)
+row_values_end=lines[total_record - 1].split()
+#print(row_values_end)
+total_time=int(row_values_end[0])  - int(row_values_begin[0])		
+
 hundredcut = int(len(lines) / 100)
 
+print ("input file [%s]\nOutput file [%s] \nReference_value[%8.2f]\ntotal record [%d] total time[%d](sec)" % (filename,outfilename,reference_value,total_record,total_time));
 
 
-print ("input file [%s]\nOutput file [%s] \nReference_value[%8.2f]\ntotal record [%d]" % (filename,outfilename,reference_value,total_record));
 
-title_lines=3
+delterm=" "
+IntegratedValue=0
 
-determ=" "
-summation=0
-skip_line = 0
 
 #for i in range(len(lines)-833117 + 4184 ):
 for i in range(len(lines)- 1 ):
 	if i < title_lines:
 		if i == 0:
-			iterms = "%s %s <%02 .3f %s \n"%(lines[i].rstrip('\n'),"y*dt",reference_value,"summation")
+			title=lines[i].rstrip('\n')
+			#print (title)
+			title_str1,title_str2=title.split('\t',2)	
+			iterms = "%s,%s,%s,<%02.3f,%s,%s\n"%(title_str1,title_str2,"y*dt",reference_value,"Intergrated Value","Intergrated Value/Total BedTime")
 			target.write(iterms)
+			unit="%s,%s,%s,%s,%s,%s\n"         %("(sec)","[%]","(%sec)","1/0","(%sec)","(%sec)")
+			target.write(unit)
 		else:
 			target.write(lines[i])
-	#if i <= skip_line:
-	#	next
+	if i < skip_line:
+		next
 	else:
-		
+		#print precentage
 		modnumber = i % hundredcut	
 		if modnumber == 0 :
 			percent = i / total_record * 100
-			print ("[%s%02d]" %("%",percent),end="",flush=True)
+			print ("[%02d%s]" %(percent,"%"),end="",flush=True)
 		#print(lines[i])
+		
+		#get two record values
 		row_values=lines[i].split()
 		row_values_next=lines[i+1].split()
 		
@@ -57,7 +73,8 @@ for i in range(len(lines)- 1 ):
 		#print(t1)
 		y_value=float(row_values[1])
 		#print(y_value)		
-		yXdt=y_value * (t1 - t)
+		#function(94.2-y)*dt
+		yXdt=(reference_value - y_value) * (t1 - t)
 		#print(yXdt)
 		if y_value <  reference_value:
 			flag = 1
@@ -65,11 +82,12 @@ for i in range(len(lines)- 1 ):
 		else:
 			#print ("flag = 0")
 			flag = 0
-		summation = summation + yXdt * flag
+		IntegratedValue = IntegratedValue + yXdt * flag
 		#print (summation)
-		output_str = "%5d %8.3f %8.3f %d %8.3f \n" % (t, y_value,yXdt,flag,summation)
+		output_str = "%5d ,%8.3f, %8.4f, %d, %8.4f , %8.4e \n" % (t, y_value,yXdt,flag,IntegratedValue, IntegratedValue / total_time)
 		#print (output_str)
 		target.write(output_str)
  
 print ("End processing,\nWe write result to file[%s]"% (outfilename))
 target.close()
+
