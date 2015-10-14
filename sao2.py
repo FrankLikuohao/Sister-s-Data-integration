@@ -35,7 +35,7 @@ skip_line = 0
 for i in range(len(lines)- 1 ):
 	if i < title_lines:
 		if i == 0:
-			iterms = "%s %s <%8.3f %s \n"%(lines[i].rstrip('\n'),"y*dt",reference_value,"summation")
+			iterms = "%s %s <%02 .3f %s \n"%(lines[i].rstrip('\n'),"y*dt",reference_value,"summation")
 			target.write(iterms)
 		else:
 			target.write(lines[i])
@@ -73,4 +73,3 @@ for i in range(len(lines)- 1 ):
  
 print ("End processing,\nWe write result to file[%s]"% (outfilename))
 target.close()
-
